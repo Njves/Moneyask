@@ -56,4 +56,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->authKey === $authKey;
     }
+
+    public function getTasks()
+    {
+        return $this->hasMany(Task::class, ['user_id' => 'id']);
+    }
 }

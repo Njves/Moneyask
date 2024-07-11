@@ -17,8 +17,10 @@ class m240707_115215_create_task_table extends Migration
             'description' => $this->string(),
             'priority' => $this->integer(),
             'done_at' => $this->dateTime(),
-            'parent_id' => $this->integer()->null()
+            'parent_id' => $this->integer()->null(),
+            'user_id' => $this->integer(),
         ]);
+//        $this->addForeignKey('fk_task_user', 'task', 'user_id', 'user', 'id');
     }
 
     /**

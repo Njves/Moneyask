@@ -6,6 +6,7 @@ use app\models\User;
 use sizeg\jwt\Jwt;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
+use yii\rest\ActiveController;
 use yii\rest\Controller;
 
 class UserController extends Controller

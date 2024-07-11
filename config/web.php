@@ -53,7 +53,17 @@ $config = [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'task'],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'task',
+                    'extraPatterns' => [
+                        'POST sync' => 'sync',
+                    ]
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'user',
+                ]
             ],
 
         ],
