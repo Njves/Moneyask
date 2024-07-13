@@ -1,35 +1,43 @@
 <?php
 
 namespace app\service;
+use app\models\Task;
 use Exception;
 use Google\Client;
 use Google\Service\Drive;
+use Kunnu\Dropbox\Dropbox;
+use Kunnu\Dropbox\DropboxApp;
+use Kunnu\Dropbox\DropboxFile;
+use Kunnu\Dropbox\Exceptions\DropboxClientException;
+use Kunnu\Dropbox\Models\AccessToken;
+use Psy\Util\Json;
+use Yii;
 
 class SyncFileService
 {
+    private Dropbox $dropbox;
 
-    public function uploadTasks($tasks): string
+    public function __construct()
     {
-            //AIzaSyBSegqyF1MVhgZHb07WeADeNlfBAoc3ZUs
-        try {
-            $client = new Client();
-            $client->useApplicationDefaultCredentials();
-            $client->addScope(Drive::DRIVE);
-            $driveService = new Drive($client);
-            $fileMetadata = new Drive\DriveFile(array(
-                'name' => 'photo.jpg'));
-            $content = file_get_contents('@app/image.jpg');
-            $file = $driveService->files->create($fileMetadata, array(
-                'data' => $content,
-                'mimeType' => 'image/jpeg',
-                'uploadType' => 'multipart',
-                'fields' => 'id'));
-            printf("File ID: %s\n", $file->id);
-            return $file->id;
-        } catch(Exception $e) {
-            echo "Error Message: ".$e;
-        }
+        $app = new DropboxApp("zbwvuivq5s15ml5", "bk8h60gujbts7ld");
+        $refresh = 'Ow0L2yZomqIAAAAAAAAAAV94F7yvj2mkf0gKuIiWUNySI6bz1gvqs4V7DE2hxUOJ';
+        $this->dropbox = new Dropbox($app);
+        $authHelper = $this->dropbox->getAuthHelper();
+        $token = $authHelper->getRefreshedAccessToken(new AccessToken(['refresh_token' => $refresh]));
+        $this->dropbox->setAccessToken($token->getToken());
     }
 
+    /**
+     * @throws DropboxClientException
+     */
+    public function uploadTasks($tasks)
+    {
 
+        $result = [];
+        foreach ($tasks as $task) {
+            /** @var Task $task */
+            $result[] = $this->dropbox->upload(new DropboxFile(Yii::getAlias('@app') . '/image.jpg'), '/image.jpg', ['autorename' => true]);
+        }
+        return $result;
+    }
 }

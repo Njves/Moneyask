@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Task;
 use app\models\User;
 use app\service\SyncFileService;
 use sizeg\jwt\JwtHttpBearerAuth;
@@ -30,9 +31,6 @@ class TaskController extends ActiveController
 
     public function actionSync()
     {
-        $tasks = Yii::$app->user->getTasks();
-        $syncFileService = new SyncFileService();
-        $fileId = $syncFileService->uploadTasks($tasks);
-        return ['fileId' => $fileId];
+        Yii::$container->get(SyncFileService::class);
     }
 }

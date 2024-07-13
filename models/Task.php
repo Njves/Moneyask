@@ -2,7 +2,11 @@
 
 namespace app\models;
 
+use Exception;
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -13,8 +17,11 @@ use yii\helpers\ArrayHelper;
  * @property int|null $priority
  * @property string|null $done_at
  * @property int|null $parent_id
+ * @property int|null $user_id
+ * @property Task $parent
+ * @property Task[] $subtasks
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -36,6 +43,31 @@ class Task extends \yii\db\ActiveRecord
         ];
     }
 
+    public function beforeSave($insert): bool
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->user_id = Yii::$app->user->id;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @throws StaleObjectException
+     * @throws \Throwable
+     */
+    public function afterSave($insert, $changedAttributes): bool
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if ($this->parent_id == $this->id) {
+            $this->delete();
+            throw new Exception('Невозможно создать задачу с ссылкой на себя в качестве родителя');
+        }
+        return true;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -47,6 +79,26 @@ class Task extends \yii\db\ActiveRecord
             'priority' => 'Priority',
             'done_at' => 'Done At',
             'parent_id' => 'Parent ID',
+            'user_id' => "User ID"
         ];
     }
+
+    public function getParent(): ActiveQuery
+    {
+        return $this->hasOne(Task::class, ['id' => 'parent_id']);
+    }
+
+    public function getSubtasks(): ActiveQuery
+    {
+        return $this->hasMany(Task::class, ['parent_id' => 'id']);
+    }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['subtasks'] = 'subtasks';
+        return $fields;
+    }
+
+
 }

@@ -7,13 +7,13 @@ use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
 {
-    public $_id;
+    public $id;
     public $accessToken;
     public $authKey;
 
     public static function tableName()
     {
-        return '{{user}}';
+        return '{{%user}}';
     }
 
 
@@ -33,12 +33,9 @@ class User extends ActiveRecord implements IdentityInterface
         return self::findOne(['access_token' => $token]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getId()
-    {
-        return $this->_id;
+
+    public function getId() {
+        return $this->getPrimaryKey();
     }
 
     /**
@@ -61,4 +58,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Task::class, ['user_id' => 'id']);
     }
+
+
 }

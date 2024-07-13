@@ -7,6 +7,9 @@
 
 namespace app\commands;
 
+use app\models\Task;
+use app\service\SyncFileService;
+use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -27,8 +30,6 @@ class HelloController extends Controller
      */
     public function actionIndex($message = 'hello world')
     {
-        echo $message . "\n";
-
-        return ExitCode::OK;
+        dd(Yii::$container->get(SyncFileService::class)->uploadTasks([Task::findOne(1)]));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use components\JwtValidationData;
+use components\DropboxComponent;
 use sizeg\jwt\Jwt;
 
 $params = require __DIR__ . '/params.php';
@@ -28,6 +28,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'enableSession' => false,
         ],
         'errorHandler' => [
 
@@ -47,15 +48,19 @@ $config = [
                 ],
             ],
         ],
+        'dropbox' => [
+            'class' => '@app/components/DropboxComponent',
+        ],
         'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
+            'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'task',
+                    'pluralize' => false,
                     'extraPatterns' => [
                         'POST sync' => 'sync',
                     ]
@@ -63,6 +68,7 @@ $config = [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'user',
+
                 ]
             ],
 
